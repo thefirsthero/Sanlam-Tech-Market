@@ -1,8 +1,0 @@
-//make the <header> element stretch across the entire screen
-var ready = (callback) => {
-    if (document.readyState != "loading") callback();
-    else document.addEventListener("DOMContentLoaded", callback);
-}
-ready(() => {
-    document.querySelector(".header").style.height = window.innerHeight + "px";
-})
