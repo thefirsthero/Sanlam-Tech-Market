@@ -11,3 +11,8 @@ In order to run this project, you will require the following modules installed:
 - Path
 - ExpressJS
 - NodeJS
+
+## HOW TO RUN
+- Ensure in root directory
+- `npm i`
+- `node JS_server.js` to run locally.
