@@ -169,6 +169,9 @@ router.get("/update", async(req, res) => {
     //res.render(path.join(__dirname, "public", "edit_user"));
 });
 
-
+//login routes for serving, capturing and verifiying
+router.get("/upload", (req, res) => {
+    res.render(path.join(__dirname, "public", "upload_solutions.ejs"));
+})
 
 module.exports = router;
