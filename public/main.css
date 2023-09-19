@@ -236,3 +236,8 @@ body {
     background-color: #42AEEC;
     color: #fff;
 }
+
+.clickable{
+    display: table-cell;
+    height: 100%;
+  }
