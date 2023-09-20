@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require("express");
 const path = require("path");
 const router = express.Router();
@@ -208,7 +209,16 @@ const solutionZipStorage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage: multer.memoryStorage(),
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            // Specify the destination folder for uploaded files
+            cb(null, 'uploads/');
+        },
+        filename: (req, file, cb) => {
+            // Use the original file name
+            cb(null, file.originalname);
+        }
+    }),
     fileFilter: (req, file, cb) => {
         // You can add custom file filtering logic here if needed
         // For example, check file types, etc.
@@ -218,68 +228,77 @@ const upload = multer({
 
 
 
-// Add a POST route to handle form submission
+// Add the /upload route handler
 router.post("/upload", upload.fields([
-    { name: 'documentation', maxCount: 1 }, // Optional documentation file
-    { name: 'solutionZip', maxCount: 1 },   // Optional solutionZip file
+    { name: 'documentation', maxCount: 1 },
+    { name: 'solutionZip', maxCount: 1 },
 ]), (req, res) => {
     // Retrieve data from the form
     const solutionName = req.body.solutionName;
     const solutionDescription = req.body.solutionDescription;
+    const solutionCategory = req.body.solutionCategory;
+    const solutionTags = req.body.solutionTags;
     const codeSnippets = req.body.codeSnippets;
     const repositoryLink = req.body.repositoryLink;
-    const solutionCategory = req.body.solutionCategory; // Access the solution category
-    const solutionTags = req.body.solutionTags; // Access the solution tags
 
     // You can check if the files were uploaded and handle them accordingly
     const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
     const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
-
+    
     // Insert data into the solutions table, including file paths if they exist
-const sql = `
-INSERT INTO solutions
-(solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-`;
+    const sql = `
+        INSERT INTO solutions
+        (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-const documentationFilePath = documentationFile ? 'uploads/documents/' + documentationFile.originalname : null;
-const solutionZipFilePath = solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.originalname : null;
+    // Execute the SQL query using mysql2
+    database.query(
+        sql,
+        [
+            solutionName,
+            solutionDescription,
+            documentationFile ? 'uploads/' + documentationFile.originalname : '',
+            solutionZipFile ? 'uploads/' + solutionZipFile.originalname : '',
+            solutionCategory,
+            solutionTags,
+            codeSnippets,
+            repositoryLink,
+        ],
+        (err, result) => {
+            if (err) {
+                console.error('Error inserting data into the database: ' + err.message);
+                res.status(500).send('Error uploading the solution.');
+                return;
+            }
 
-// Execute the SQL query using mysql2
-database.query(
-sql,
-[
-    solutionName,
-    solutionDescription,
-    documentationFilePath,
-    solutionZipFilePath,
-    solutionCategory,
-    solutionTags,
-    codeSnippets,
-    repositoryLink,
-],
-(err, result) => {
-    // Handle errors and success
-    if (err) {
-        console.error('Error inserting data into the database: ' + err.message);
-        res.status(500).send('Error uploading the solution.');
-        return;
-    }
+            // Handle file uploads separately
+            if (documentationFile) {
+                const documentationFilePath = 'uploads/' + documentationFile.originalname;
+                fs.writeFile(documentationFilePath, documentationFile.buffer, (err) => {
+                    if (err) {
+                        console.error('Error writing documentation file: ' + err.message);
+                    } else {
+                        console.log('Documentation file saved:', documentationFilePath);
+                    }
+                });
+            }
 
-    // Log successful file uploads
-    if (documentationFile) {
-        console.log('Documentation uploaded successfully:', documentationFilePath);
-    }
+            if (solutionZipFile) {
+                const solutionZipFilePath = 'uploads/' + solutionZipFile.originalname;
+                fs.writeFile(solutionZipFilePath, solutionZipFile.buffer, (err) => {
+                    if (err) {
+                        console.error('Error writing solution ZIP file: ' + err.message);
+                    } else {
+                        console.log('Solution ZIP file saved:', solutionZipFilePath);
+                    }
+                });
+            }
 
-    if (solutionZipFile) {
-        console.log('Solution ZIP file uploaded successfully:', solutionZipFilePath);
-    }
-
-    console.log('Solution uploaded successfully');
-    res.status(200).send('Solution uploaded successfully');
-}
-);
-
+            console.log('Solution uploaded successfully');
+            res.status(200).send('Solution uploaded successfully');
+        }
+    );
 });
 
 module.exports = router;

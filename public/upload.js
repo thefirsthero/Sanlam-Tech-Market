@@ -30,13 +30,23 @@ db.connect((err) => {
 });
 
 const upload = multer({
-    storage: multer.memoryStorage(),
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            // Specify the destination folder for uploaded files
+            cb(null, 'uploads/');
+        },
+        filename: (req, file, cb) => {
+            // Use the original file name
+            cb(null, file.originalname);
+        }
+    }),
     fileFilter: (req, file, cb) => {
         // You can add custom file filtering logic here if needed
         // For example, check file types, etc.
         cb(null, true);
     }
 });
+
 
 
 // Define a route to handle the form submission
@@ -63,8 +73,8 @@ INSERT INTO solutions
 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
-const documentationFilePath = documentationFile ? 'uploads/documents/' + documentationFile.originalname : null;
-const solutionZipFilePath = solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.originalname : null;
+const documentationFilePath = documentationFile ? 'uploads/' + documentationFile.originalname : null;
+const solutionZipFilePath = solutionZipFile ? 'uploads/' + solutionZipFile.originalname : null;
 
 // Execute the SQL query using mysql2
 db.query(
