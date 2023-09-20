@@ -189,7 +189,7 @@ router.get("/upload", (req, res) => {
 const documentationStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         // Specify the destination folder for documentation
-        cb(null, 'uploads/documents/');
+        cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
         // Use the original file name
@@ -200,7 +200,7 @@ const documentationStorage = multer.diskStorage({
 const solutionZipStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         // Specify the destination folder for solutionZip
-        cb(null, 'uploads/code_zip_files/');
+        cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
         // Use the original file name

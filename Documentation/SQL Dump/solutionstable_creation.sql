@@ -18,8 +18,8 @@ create table `solutions` (
 insert into solutions(solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link) values (
 	"UiPath Bot", 
     "Bot that auto-responds to basic user queries sent to the MiWay email box", 
-    "uploads/code_zip_files",
-    "uploads/documents",
+    "uploads/",
+    "uploads/",
     "Automation",
     "Bots",
     "import '../styles/App.css'; 
