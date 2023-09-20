@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const router = express.Router();
 const database = require("./database");
+const multer = require('multer'); // Require multer for handling file uploads
 
 //home route
 router.get("/", (req, res) => {
@@ -156,7 +157,7 @@ router.get('/adminPortal', async (req, res) => {
         console.log(admins);
 
     } else {
-        console.log("Admiin not registered!!!");
+        console.log("Admin not registered!!!");
     }
 
 });
@@ -183,5 +184,70 @@ router.get("/update", async(req, res) => {
 router.get("/upload", (req, res) => {
     res.render(path.join(__dirname, "public", "upload_solutions.ejs"));
 })
+
+// Handle file uploads using multer
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: function (req, file, cb) {
+        cb(null, file.originalname); // Use the original file name
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        // You can add custom file filtering logic here if needed
+        // For example, check file types, etc.
+        cb(null, true);
+    }
+});
+
+// Add a POST route to handle form submission
+router.post("/upload", upload.fields([
+    { name: 'documentation', maxCount: 1 }, // Optional documentation file
+    { name: 'solutionZip', maxCount: 1 },   // Optional solutionZip file
+]), (req, res) => {
+    // Retrieve data from the form
+    const solutionName = req.body.solutionName;
+    const solutionDescription = req.body.solutionDescription;
+    const codeSnippets = req.body.codeSnippets;
+    const repositoryLink = req.body.repositoryLink;
+    const solutionCategory = req.body.solutionCategory; // Access the solution category
+    const solutionTags = req.body.solutionTags; // Access the solution tags
+
+    // You can check if the files were uploaded and handle them accordingly
+    const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
+    const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
+
+    // Insert data into the solutions table, including file paths if they exist
+    const sql = `
+        INSERT INTO solutions
+        (solution_name, solution_description, solution_path, solution_category, solution_tags, solution_snippet, solution_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    // Execute the SQL query using your database connection (database.query)
+    database.query(
+        sql,
+        [
+            solutionName,
+            solutionDescription,
+            'uploads/' + (documentationFile ? documentationFile.filename : ''), // Use documentation file if it exists
+            solutionCategory, // Specify the category
+            solutionTags, // Specify tags
+            codeSnippets,
+            repositoryLink,
+        ],
+        (err, result) => {
+            if (err) {
+                console.error('Error inserting data into the database: ' + err.message);
+                return res.status(500).send('Error uploading the solution.');
+            }
+
+            console.log('Solution uploaded successfully');
+            res.status(200).send('Solution uploaded successfully');
+        }
+    );
+});
 
 module.exports = router;
