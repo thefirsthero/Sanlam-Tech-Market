@@ -186,21 +186,29 @@ router.get("/upload", (req, res) => {
 })
 
 // Handle file uploads using multer
-const storage = multer.diskStorage({
-    destination: 'uploads/',
+const documentationStorage = multer.diskStorage({
+    destination: 'uploads/documents/', // Destination folder for documentation
+    filename: function (req, file, cb) {
+        cb(null, file.originalname); // Use the original file name
+    }
+});
+
+const solutionZipStorage = multer.diskStorage({
+    destination: 'uploads/code_zip_files/', // Destination folder for solutionZip
     filename: function (req, file, cb) {
         cb(null, file.originalname); // Use the original file name
     }
 });
 
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     fileFilter: function (req, file, cb) {
         // You can add custom file filtering logic here if needed
         // For example, check file types, etc.
         cb(null, true);
     }
 });
+
 
 // Add a POST route to handle form submission
 router.post("/upload", upload.fields([
@@ -222,8 +230,8 @@ router.post("/upload", upload.fields([
     // Insert data into the solutions table, including file paths if they exist
     const sql = `
         INSERT INTO solutions
-        (solution_name, solution_description, solution_path, solution_category, solution_tags, solution_snippet, solution_link)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Execute the SQL query using your database connection (database.query)
@@ -232,7 +240,8 @@ router.post("/upload", upload.fields([
         [
             solutionName,
             solutionDescription,
-            'uploads/' + (documentationFile ? documentationFile.filename : ''), // Use documentation file if it exists
+            documentationFile ? 'uploads/documents/' + documentationFile.filename : '', // Use documentation file if it exists
+            solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.filename : '', // Use solutionZipFile file if it exists
             solutionCategory, // Specify the category
             solutionTags, // Specify tags
             codeSnippets,

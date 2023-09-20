@@ -29,16 +29,23 @@ db.connect((err) => {
   console.log('Connected to the database');
 });
 
-// Handle file uploads using multer
-const storage = multer.diskStorage({
-    destination: 'uploads/',
+// Handle file uploads using Multer
+const documentationStorage = multer.diskStorage({
+    destination: 'uploads/documents/', // Destination folder for documentation
+    filename: function (req, file, cb) {
+        cb(null, file.originalname); // Use the original file name
+    }
+});
+
+const solutionZipStorage = multer.diskStorage({
+    destination: 'uploads/code_zip_files/', // Destination folder for solutionZip
     filename: function (req, file, cb) {
         cb(null, file.originalname); // Use the original file name
     }
 });
 
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     fileFilter: function (req, file, cb) {
         // You can add custom file filtering logic here if needed
         // For example, check file types, etc.
@@ -46,9 +53,11 @@ const upload = multer({
     }
 });
 
-
 // Define a route to handle the form submission
-app.post('/upload', (req, res) => {
+app.post('/upload', upload.fields([
+    { name: 'documentation', maxCount: 1 }, // Optional documentation file
+    { name: 'solutionZip', maxCount: 1 },   // Optional solutionZip file
+]), (req, res) => {
   // Retrieve data from the form
   const solutionName = req.body.solutionName;
   const solutionDescription = req.body.solutionDescription;
@@ -57,11 +66,15 @@ app.post('/upload', (req, res) => {
   const codeSnippets = req.body.codeSnippets;
   const repositoryLink = req.body.repositoryLink;
 
-  // Insert data into the solutions table
+  // You can check if the files were uploaded and handle them accordingly
+  const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
+  const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
+
+  // Insert data into the solutions table, including file paths if they exist
   const sql = `
     INSERT INTO solutions
-    (solution_name, solution_description, solution_path, solution_category, solution_tags, solution_snippet, solution_link)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   // Execute the SQL query using mysql2
@@ -70,7 +83,8 @@ app.post('/upload', (req, res) => {
     [
         solutionName,
         solutionDescription,
-        'uploads/', // Path to the uploaded documentation PDF
+        documentationFile ? 'uploads/documents/' + documentationFile.filename : '', // Use documentation file if it exists
+        solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.filename : '', // Use solutionZipFile file if it exists
         solutionCategory, // Specify the category
         solutionTags, // Specify tags
         codeSnippets,
@@ -83,7 +97,18 @@ app.post('/upload', (req, res) => {
         return;
       }
 
-      // TODO: Handle file uploads separately using multer and save them to the server
+      // TODO: Handle file uploads separately using Multer and save them to the server
+      if (documentationFile) {
+          // Documentation file was uploaded, you can save it to the server
+          // Example: fs.writeFileSync('uploads/documents/' + documentationFile.filename, documentationFile.buffer);
+          console.log('Documentation uploaded successfully:', documentationFile.originalname);
+   }
+
+      if (solutionZipFile) {
+          // Solution ZIP file was uploaded, you can save it to the server
+          // Example: fs.writeFileSync('uploads/code_zip_files/' + solutionZipFile.filename, solutionZipFile.buffer);
+          console.log('Solution ZIP file uploaded successfully:', solutionZipFile.originalname);
+      }
 
       console.log('Solution uploaded successfully');
       res.status(200).send('Solution uploaded successfully');
