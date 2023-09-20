@@ -77,6 +77,16 @@ router.get("/about", (req, res) => {
 router.get("/resetpass", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "resetpassword.html"));
 })
+//Single_Solution route
+router.get("/single_solution", async (req, res) => {
+    try {
+        res.status(200).render(path.join(__dirname, "public", "single_solution"));
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send("Error occurred");
+    }
+});
 
 //test route
 router.get("/test", async (req, res) => {

@@ -1,0 +1,56 @@
+.main_card{
+    width:350px;
+    height:370px;
+    background-color: antiquewhite;
+}
+.height{
+    
+    height:100vh;
+}
+
+.card{
+    width:350px;
+    height:370px;
+}
+
+.image{
+    
+    position:absolute;
+    top:10px;
+}
+
+.main-heading{
+    font-family: Helvetica;
+    font-size:40px;
+    color:#0075c9; 
+}
+
+.ratings i{
+    
+    color:orange;
+    
+}
+
+.user-ratings h6{
+    margin-top:2px;
+}
+
+.colors{
+    display:flex;
+    margin-top:2px;
+}
+
+.colors span{
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;
+    margin-right:6px;
+}
+
+.btn-danger{
+    
+    height:48px;
+    font-size:18px;
+}
