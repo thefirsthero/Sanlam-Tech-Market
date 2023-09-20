@@ -47,8 +47,6 @@ const upload = multer({
     }
 });
 
-
-
 // Define a route to handle the form submission
 app.post('/upload', upload.fields([
     { name: 'documentation', maxCount: 1 }, // Optional documentation file

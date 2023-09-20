@@ -232,7 +232,7 @@ const upload = multer({
 router.post("/upload", upload.fields([
     { name: 'documentation', maxCount: 1 },
     { name: 'solutionZip', maxCount: 1 },
-]), (req, res) => {
+]), async (req, res) => {
     // Retrieve data from the form
     const solutionName = req.body.solutionName;
     const solutionDescription = req.body.solutionDescription;
@@ -244,7 +244,7 @@ router.post("/upload", upload.fields([
     // You can check if the files were uploaded and handle them accordingly
     const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
     const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
-    
+
     // Insert data into the solutions table, including file paths if they exist
     const sql = `
         INSERT INTO solutions
@@ -252,53 +252,54 @@ router.post("/upload", upload.fields([
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // Execute the SQL query using mysql2
-    database.query(
-        sql,
-        [
-            solutionName,
-            solutionDescription,
-            documentationFile ? 'uploads/' + documentationFile.originalname : '',
-            solutionZipFile ? 'uploads/' + solutionZipFile.originalname : '',
-            solutionCategory,
-            solutionTags,
-            codeSnippets,
-            repositoryLink,
-        ],
-        (err, result) => {
-            if (err) {
-                console.error('Error inserting data into the database: ' + err.message);
-                res.status(500).send('Error uploading the solution.');
-                return;
-            }
+    try {
+        // Execute the SQL query using mysql2
+        await database.query(
+            sql,
+            [
+                solutionName,
+                solutionDescription,
+                documentationFile ? 'uploads/' + documentationFile.originalname : null,
+                solutionZipFile ? 'uploads/' + solutionZipFile.originalname : null,
+                solutionCategory,
+                solutionTags,
+                codeSnippets,
+                repositoryLink,
+            ]
+        );
 
-            // Handle file uploads separately
-            if (documentationFile) {
-                const documentationFilePath = 'uploads/' + documentationFile.originalname;
-                fs.writeFile(documentationFilePath, documentationFile.buffer, (err) => {
-                    if (err) {
-                        console.error('Error writing documentation file: ' + err.message);
-                    } else {
-                        console.log('Documentation file saved:', documentationFilePath);
-                    }
-                });
-            }
-
-            if (solutionZipFile) {
-                const solutionZipFilePath = 'uploads/' + solutionZipFile.originalname;
-                fs.writeFile(solutionZipFilePath, solutionZipFile.buffer, (err) => {
-                    if (err) {
-                        console.error('Error writing solution ZIP file: ' + err.message);
-                    } else {
-                        console.log('Solution ZIP file saved:', solutionZipFilePath);
-                    }
-                });
-            }
-
-            console.log('Solution uploaded successfully');
-            res.status(200).send('Solution uploaded successfully');
+        // Handle file uploads separately if they exist
+        if (documentationFile && documentationFile.buffer) {
+            const documentationFilePath = 'uploads/' + documentationFile.originalname;
+            fs.writeFile(documentationFilePath, documentationFile.buffer, (err) => {
+                if (err) {
+                    console.error('Error writing documentation file: ' + err.message);
+                } else {
+                    console.log('Documentation file saved:', documentationFilePath);
+                }
+            });
         }
-    );
+
+        if (solutionZipFile && solutionZipFile.buffer) {
+            const solutionZipFilePath = 'uploads/' + solutionZipFile.originalname;
+            fs.writeFile(solutionZipFilePath, solutionZipFile.buffer, (err) => {
+                if (err) {
+                    console.error('Error writing solution ZIP file: ' + err.message);
+                } else {
+                    console.log('Solution ZIP file saved:', solutionZipFilePath);
+                }
+            });
+        }
+
+        console.log('Solution uploaded successfully');
+        
+        // Send a success message to the user and redirect to client_home
+        res.status(200).send('Solution uploaded successfully. Redirecting to client home...');
+    } catch (error) {
+        console.error('Error inserting data into the database: ' + error.message);
+        res.status(500).send('Error uploading the solution.');
+    }
 });
+
 
 module.exports = router;
