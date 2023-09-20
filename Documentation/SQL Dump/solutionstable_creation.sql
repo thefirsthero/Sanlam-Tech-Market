@@ -5,7 +5,8 @@ create table `solutions` (
 	solutionId int NOT NULL auto_increment primary key,
     solution_name varchar(100),
     solution_description varchar(250),
-    solution_path varchar(100),
+    solution_documents_path varchar(100),
+    solution_codezip_path varchar(100),
     solution_category varchar(100),
     solution_tags varchar(100),
     solution_snippet varchar(10000),
@@ -14,10 +15,11 @@ create table `solutions` (
 
 /* Example add to table*/;
 
-insert into solutions(solution_name, solution_description, solution_path, solution_category, solution_tags, solution_snippet, solution_link) values (
+insert into solutions(solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link) values (
 	"UiPath Bot", 
     "Bot that auto-responds to basic user queries sent to the MiWay email box", 
-    "C://",
+    "uploads/code_zip_files",
+    "uploads/documents",
     "Automation",
     "Bots",
     "import '../styles/App.css'; 
