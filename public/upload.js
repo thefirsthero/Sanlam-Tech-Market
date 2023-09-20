@@ -29,29 +29,15 @@ db.connect((err) => {
   console.log('Connected to the database');
 });
 
-// Handle file uploads using Multer
-const documentationStorage = multer.diskStorage({
-    destination: 'uploads/documents/', // Destination folder for documentation
-    filename: function (req, file, cb) {
-        cb(null, file.originalname); // Use the original file name
-    }
-});
-
-const solutionZipStorage = multer.diskStorage({
-    destination: 'uploads/code_zip_files/', // Destination folder for solutionZip
-    filename: function (req, file, cb) {
-        cb(null, file.originalname); // Use the original file name
-    }
-});
-
 const upload = multer({
     storage: multer.memoryStorage(),
-    fileFilter: function (req, file, cb) {
+    fileFilter: (req, file, cb) => {
         // You can add custom file filtering logic here if needed
         // For example, check file types, etc.
         cb(null, true);
     }
 });
+
 
 // Define a route to handle the form submission
 app.post('/upload', upload.fields([
@@ -71,49 +57,50 @@ app.post('/upload', upload.fields([
   const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
 
   // Insert data into the solutions table, including file paths if they exist
-  const sql = `
-    INSERT INTO solutions
-    (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+const sql = `
+INSERT INTO solutions
+(solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
-  // Execute the SQL query using mysql2
-  db.query(
-    sql,
-    [
-        solutionName,
-        solutionDescription,
-        documentationFile ? 'uploads/documents/' + documentationFile.filename : '', // Use documentation file if it exists
-        solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.filename : '', // Use solutionZipFile file if it exists
-        solutionCategory, // Specify the category
-        solutionTags, // Specify tags
-        codeSnippets,
-        repositoryLink,
-    ],
-    (err, result) => {
-      if (err) {
+const documentationFilePath = documentationFile ? 'uploads/documents/' + documentationFile.originalname : null;
+const solutionZipFilePath = solutionZipFile ? 'uploads/code_zip_files/' + solutionZipFile.originalname : null;
+
+// Execute the SQL query using mysql2
+db.query(
+sql,
+[
+    solutionName,
+    solutionDescription,
+    documentationFilePath,
+    solutionZipFilePath,
+    solutionCategory,
+    solutionTags,
+    codeSnippets,
+    repositoryLink,
+],
+(err, result) => {
+    // Handle errors and success
+    if (err) {
         console.error('Error inserting data into the database: ' + err.message);
         res.status(500).send('Error uploading the solution.');
         return;
-      }
-
-      // TODO: Handle file uploads separately using Multer and save them to the server
-      if (documentationFile) {
-          // Documentation file was uploaded, you can save it to the server
-          // Example: fs.writeFileSync('uploads/documents/' + documentationFile.filename, documentationFile.buffer);
-          console.log('Documentation uploaded successfully:', documentationFile.originalname);
-   }
-
-      if (solutionZipFile) {
-          // Solution ZIP file was uploaded, you can save it to the server
-          // Example: fs.writeFileSync('uploads/code_zip_files/' + solutionZipFile.filename, solutionZipFile.buffer);
-          console.log('Solution ZIP file uploaded successfully:', solutionZipFile.originalname);
-      }
-
-      console.log('Solution uploaded successfully');
-      res.status(200).send('Solution uploaded successfully');
     }
-  );
+
+    // Log successful file uploads
+    if (documentationFile) {
+        console.log('Documentation uploaded successfully:', documentationFilePath);
+    }
+
+    if (solutionZipFile) {
+        console.log('Solution ZIP file uploaded successfully:', solutionZipFilePath);
+    }
+
+    console.log('Solution uploaded successfully');
+    res.status(200).send('Solution uploaded successfully');
+}
+);
+
 });
 
 // Start the Express server
