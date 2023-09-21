@@ -1,128 +1,154 @@
 <!-- user_solutions.ejs -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>My Solutions</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main.css">
     <style>
         /* Add your custom styles for the upload form here */
-        .upload-form {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* CSS to make the policy images a fixed size */
+        /* CSS to make the policy images a fixed size and style the tiles */
         .policy-image {
-            width: 400px; /* Set the desired width */
-            height: 200px; /* Set the desired height */
+            width: 100%;
+            max-height: 200px;
+            /* Set the desired maximum height */
+            object-fit: cover;
+            /* Maintain aspect ratio and cover the entire container */
         }
 
-        /* CSS to create gaps between policy rows */
+        .block {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease-in-out;
+            height: 100%;
+            /* Make sure all blocks are the same height */
+        }
+
+        .block:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .block-body {
+            text-align: center;
+        }
+
         .policy-row {
-            margin-bottom: 20px; /* Adjust the margin value to set the desired gap size */
+            margin-bottom: 20px;
         }
     </style>
+
 </head>
+
 <body>
-   <!-- Header Navigation -->
-   <nav class="navbar navbar-expand-md">
-    <a class="navbar-brand" href="#">
-        <img src="images/footerLogoWhite.png" title="title" alt="additional title" />
-    </a>
-    <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="main-navigation">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/client_home">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#contact_info">Contact</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/upload">Upload Solution</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/user_solutions">My Solutions</a>
-            </li>                
-            <li class="nav-item">
-                <a class="nav-link" href="/">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-    
-<div class="container">
-    <br>
-    <div class="row policy-row">
-        <% userSolutions.forEach((solution, index) => { %>
-            <div class="col-md-4">
-                <div class="shop-default shop-cards shop-tech">
-                    <div class="block product no-border z-depth-2-top z-depth-2--hover">
-                        <div class="block-image">
-                            <a href="#">
-                                <!-- Use an image for the solution -->
-                                <img src="images/<%= solution.solution_name %>.gif" class="img-center policy-image">
-                            </a>
-                            <!-- You can add labels or badges as needed -->
-                        </div>
-                        <div class="block-body text-center">
-                            <h3 class="heading heading-5 strong-600 text-capitalize">
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-md">
+        <a class="navbar-brand" href="#">
+            <img src="images/footerLogoWhite.png" title="title" alt="additional title" />
+        </a>
+        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-navigation">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/client_home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact_info">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/upload">Upload Solution</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user_solutions">My Solutions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <br>
+        <div class="row policy-row">
+            <% userSolutions.forEach((solution, index)=> { %>
+                <div class="col-md-4">
+                    <div class="shop-default shop-cards shop-tech">
+                        <div class="block product no-border z-depth-2-top z-depth-2--hover">
+                            <div class="block-image">
                                 <a href="#">
-                                    <%= solution.solution_name %>  
+                                    <!-- Use an image for the solution -->
+                                    <img src="images/<%= solution.solution_name %>.gif" class="img-center policy-image">
                                 </a>
-                            </h3>
-                            <p class="product-description">
-                                <%= solution.solution_description %>  
-                            </p>
-                            <div class="product-buttons mt-4">
-                                <div class="row align-items-center">
-                                    <div class="col-12">
-                                        <!-- Link to view the solution details -->
-                                        <button type="button" class="btn btn-block btn-primary btn-circle btn-icon-left" onclick="window.location.href='/single_solution'">
-                                            <i class="fa fa-shopping-cart"></i> View Solution
-                                        </button>
-                                        <button type="button" class="btn btn-block btn-danger btn-circle btn-icon-left mt-2" onclick="confirmDelete('<%= solution.solutionId %>')">
-                                            <i class="fa fa-trash"></i> Delete Solution
-                                        </button>
+                                <!-- You can add labels or badges as needed -->
+                            </div>
+                            <div class="block-body text-center">
+                                <h3 class="heading heading-5 strong-600 text-capitalize">
+                                    <a href="#">
+                                        <%= solution.solution_name %>
+                                    </a>
+                                </h3>
+                                <p class="product-description">
+                                    <%= solution.solution_description %>
+                                </p>
+                                <div class="product-buttons mt-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-12">
+                                            <!-- Link to view the solution details -->
+                                            <button type="button"
+                                                class="btn btn-block btn-primary btn-circle btn-icon-left"
+                                                onclick="window.location.href='/single_solution'">
+                                                <i class="fa fa-shopping-cart"></i> View Solution
+                                            </button>
+                                            <button type="button"
+                                                class="btn btn-block btn-danger btn-circle btn-icon-left mt-2"
+                                                onclick="confirmDelete('<%= solution.solutionId %>')">
+                                                <i class="fa fa-trash"></i> Delete Solution
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <% if ((index + 1) % 3 === 0) { %>
-                </div><div class="row policy-row">
+                <% if ((index + 1) % 3===0) { %>
+        </div>
+        <div class="row policy-row">
             <% } %>
-        <% }); %>
+                <% }); %>
+        </div>
     </div>
-</div>
-    
+
     <!-- Footer -->
     <footer class="page-footer">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12">
                     <h6 class="text-uppercase font-weight-bold">Additional Information</h6>
-                    <p> Sanlam Limited is the licensed controlling company of the Sanlam Limited Insurance Group. Sanlam Life Insurance Limited is a licensed life insurer, authorised financial services provider and a registered credit provider (NCRCP43).</p>
+                    <p> Sanlam Limited is the licensed controlling company of the Sanlam Limited Insurance Group. Sanlam
+                        Life Insurance Limited is a licensed life insurer, authorised financial services provider and a
+                        registered credit provider (NCRCP43).</p>
                     <p> All rights reserved.</p>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12" id="contact_info">
                     <h6 class="text-uppercase font-weight-bold">Contact</h6>
-                    <p>Sanlam Head Office 2 Strand Road Bellville, 
-                        <br/>South Africa Postal: PO Box 1 Sanlamhof, 7532 
-                        <br/>GPS coordinates: 33"45'09.77S 18"38'28.32E
-                        <br/>webmaster@sanlam.co.za
-                        <br/>Tel: +27 21 947 3359
+                    <p>Sanlam Head Office 2 Strand Road Bellville,
+                        <br />South Africa Postal: PO Box 1 Sanlamhof, 7532
+                        <br />GPS coordinates: 33"45'09.77S 18"38'28.32E
+                        <br />webmaster@sanlam.co.za
+                        <br />Tel: +27 21 947 3359
                     </p>
                 </div>
             </div>
@@ -131,9 +157,14 @@
     </footer>
 
     <!-- Scripts (Copy from your existing page) -->
-    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.js"
+        integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
     <script src="main.js"></script>
 
     <script>
@@ -143,7 +174,7 @@
                 $.ajax({
                     url: `/delete_solution/${solutionId}`,
                     method: "DELETE", // Use DELETE method
-                    success: function(response) {
+                    success: function (response) {
                         // Handle success, such as redirecting to a success page or updating the UI
                         if (response.success) {
                             alert("Solution deleted successfully.");
@@ -153,7 +184,7 @@
                             alert("Failed to delete the solution.");
                         }
                     },
-                    error: function() {
+                    error: function () {
                         // Handle errors, such as displaying an error message
                         alert("An error occurred while deleting the solution.");
                     }
@@ -163,4 +194,5 @@
     </script>
 
 </body>
+
 </html>

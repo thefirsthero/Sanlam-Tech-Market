@@ -199,20 +199,20 @@ router.get("/update", async(req, res) => {
 });
 
 //login routes for serving, capturing and verifiying
-router.get("/upload", (req, res) => {
-    res.render(path.join(__dirname, "public", "upload_solutions.ejs"));
-})
+router.get("/upload", async (req, res) => {
+    try {
+        // Fetch unique policy names from the policy_table
+        const policies = await database.query("SELECT DISTINCT policy_name FROM policy_table");
 
-const documentationStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        // Specify the destination folder for documentation
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        // Use the original file name
-        cb(null, file.originalname);
+        // Render the upload_solutions.ejs template and pass the policies as an option
+        res.render(path.join(__dirname, "public", "upload_solutions.ejs"), { policies });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error occurred");
     }
 });
+
+
 
 const solutionZipStorage = multer.diskStorage({
     destination: (req, file, cb) => {
