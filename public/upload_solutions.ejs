@@ -12,6 +12,7 @@
         .upload-form {
             max-width: 800px;
             margin: 0 auto;
+            padding: 20px; /* Add some spacing around the form */
         }
     </style>
 </head>
@@ -49,62 +50,55 @@
         </div>
     </nav>
 
-    <!-- Update your Upload Solution form -->
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="solutionName">Solution Name</label>
-            <input type="text" class="form-control" id="solutionName" name="solutionName" required>
-        </div>
-        <div class="form-group">
-            <label for="solutionDescription">Solution Description</label>
-            <textarea class="form-control" id="solutionDescription" name="solutionDescription" rows="3" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="codeSnippets">Code Snippets</label>
-            <input type="text" class="form-control-file" id="codeSnippets" name="codeSnippets">
-        </div>
-        <div class="form-group">
-            <label for="documentation">Documentation PDF</label>
-            <input type="file" class="form-control-file" id="documentation" name="documentation" multiple>
-        </div>
-        <div class="form-group">
-            <label for="solutionZip">Solution ZIP File</label>
-            <input type="file" class="form-control-file" id="solutionZip" name="solutionZip" multiple>
-        </div>
-        <div class="form-group">
-            <label for="repositoryLink">Repository Link (Optional)</label>
-            <input type="text" class="form-control" id="repositoryLink" name="repositoryLink">
-        </div>
-        <div class="form-group">
-            <label for="solutionCategory">Solution Category</label>
-            <input type="text" class="form-control" id="solutionCategory" name="solutionCategory">
-        </div>
-        <div class="form-group">
-            <label for="solutionTags">Solution Tags</label>
-            <input type="text" class="form-control" id="solutionTags" name="solutionTags">
-        </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
-
-
-    <footer class="page-footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-md-8 col-sm-12">
-                    <h6 class="text-uppercase font-weight-bold">Additional Information</h6>
-                    <p> Sanlam Limited is the licensed controlling company of the Sanlam Limited Insurance Group. Sanlam Life Insurance Limited is a licensed life insurer, authorised financial services provider and a registered credit provider (NCRCP43).</p>
-                    <p> All rights reserved.</p>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-12" id="contact_info">
-                    <h6 class="text-uppercase font-weight-bold">Contact</h6>
-                    <p>Sanlam Head Office 2 Strand Road Bellville, 
-                        <br/>South Africa Postal: PO Box 1 Sanlamhof, 7532 
-                        <br/>GPS coordinates: 33"45'09.77S 18"38'28.32E
-                        <br/>webmaster@sanlam.co.za
-                        <br/>Tel: +27 21 947 3359
-                    </p>
-                </div>
+    <div class="container upload-form">
+        <h2 class="mt-4 mb-4">Upload Solution</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="solutionName">Solution Name</label>
+                <input type="text" class="form-control" id="solutionName" name="solutionName" required>
             </div>
+            <div class="form-group">
+                <label for="solutionDescription">Solution Description</label>
+                <textarea class="form-control" id="solutionDescription" name="solutionDescription" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="codeSnippets">Code Snippets</label>
+                <input type="text" class="form-control" id="codeSnippets" name="codeSnippets">
+            </div>
+            <div class="form-group">
+                <label for="documentation">Documentation PDF</label>
+                <input type="file" class="form-control-file" id="documentation" name="documentation" multiple>
+            </div>
+            <div class="form-group">
+                <label for="solutionZip">Solution ZIP File</label>
+                <input type="file" class="form-control-file" id="solutionZip" name="solutionZip" multiple>
+            </div>
+            <div class="form-group">
+                <label for="repositoryLink">Repository Link (Optional)</label>
+                <input type="text" class="form-control" id="repositoryLink" name="repositoryLink">
+            </div>
+            <!-- Update the solutionCategory field to be a dropdown -->
+            <div class="form-group">
+                <label for="solutionCategory">Solution Category</label>
+                <select class="form-control" id="solutionCategory" name="solutionCategory" required>
+                    <!-- Iterate through policies and create options -->
+                    <% for (let policy of policies) { %>
+                        <option value="<%= policy.policy_name %>"><%= policy.policy_name %></option>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="solutionTags">Solution Tags</label>
+                <input type="text" class="form-control" id="solutionTags" name="solutionTags">
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer mt-5">
+        <div class="container">
+            <!-- Footer content -->
         </div>
         <div class="footer-copyright text-center">© 2023 Copyright: Obsidian Fairies</div>
     </footer>
