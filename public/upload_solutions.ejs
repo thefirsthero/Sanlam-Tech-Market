@@ -26,6 +26,13 @@
             border: 1px solid #ccc;
             height: auto;
         }
+        /* Custom styles for navbar links */
+        .navbar-nav .nav-link {
+            color: #333; /* Change the color to your desired shade */
+        }
+        .navbar-nav .nav-link:hover {
+            color: #007bff; /* Change the hover color to your desired shade */
+        }
     </style>
 </head>
 
@@ -64,7 +71,7 @@
 
     <!-- Update your Upload Solution form -->
     <div class="container upload-form mt-4">
-        <<h2 class="mt-4">Upload Solution</h2>
+        <h2 class="mt-4">Upload Solution</h2>
         <form action="/upload" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="solutionName">Solution Name</label>
