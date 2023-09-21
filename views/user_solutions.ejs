@@ -60,50 +60,52 @@
     </div>
 </nav>
     
-    <div class="container">
-        <br>
-        <div class="row policy-row">
-            <% userSolutions.forEach((solution, index) => { %>
-                <div class="col-md-4">
-                    <div class="shop-default shop-cards shop-tech">
-                        <div class="block product no-border z-depth-2-top z-depth-2--hover">
-                            <div class="block-image">
+<div class="container">
+    <br>
+    <div class="row policy-row">
+        <% userSolutions.forEach((solution, index) => { %>
+            <div class="col-md-4">
+                <div class="shop-default shop-cards shop-tech">
+                    <div class="block product no-border z-depth-2-top z-depth-2--hover">
+                        <div class="block-image">
+                            <a href="#">
+                                <!-- Use an image for the solution -->
+                                <img src="images/<%= solution.solution_name %>.gif" class="img-center policy-image">
+                            </a>
+                            <!-- You can add labels or badges as needed -->
+                        </div>
+                        <div class="block-body text-center">
+                            <h3 class="heading heading-5 strong-600 text-capitalize">
                                 <a href="#">
-                                    <!-- Use an image for the solution -->
-                                    <img src="images/<%= solution.solution_name %>.gif" class="img-center policy-image">
+                                    <%= solution.solution_name %>  
                                 </a>
-                                <!-- You can add labels or badges as needed -->
-                            </div>
-                            <div class="block-body text-center">
-                                <h3 class="heading heading-5 strong-600 text-capitalize">
-                                    <a href="#">
-                                        <%= solution.solution_name %>  
-                                    </a>
-                                </h3>
-                                <p class="product-description">
-                                    <%= solution.solution_description %>  
-                                </p>
-                                <div class="product-buttons mt-4">
-                                    <div class="row align-items-center">
-                                        <div class="col-8">
-                                            <!-- Link to view the solution details -->
-                                            <button type="button" class="btn btn-block btn-primary btn-circle btn-icon-left" onclick="window.location.href='/single_solution'">
-                                                <i class="fa fa-shopping-cart"></i> View Solution
-                                            </button>
-                                        </div>
-                                        <!-- Other buttons or actions can be added here -->
+                            </h3>
+                            <p class="product-description">
+                                <%= solution.solution_description %>  
+                            </p>
+                            <div class="product-buttons mt-4">
+                                <div class="row align-items-center">
+                                    <div class="col-12">
+                                        <!-- Link to view the solution details -->
+                                        <button type="button" class="btn btn-block btn-primary btn-circle btn-icon-left" onclick="window.location.href='/single_solution'">
+                                            <i class="fa fa-shopping-cart"></i> View Solution
+                                        </button>
+                                        <button type="button" class="btn btn-block btn-danger btn-circle btn-icon-left mt-2" onclick="confirmDelete('<%= solution.solutionId %>')">
+                                            <i class="fa fa-trash"></i> Delete Solution
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <% if ((index + 1) % 3 === 0) { %>
-                    </div><div class="row policy-row">
-                <% } %>
-            <% }); %>
-        </div>
+            </div>
+            <% if ((index + 1) % 3 === 0) { %>
+                </div><div class="row policy-row">
+            <% } %>
+        <% }); %>
     </div>
+</div>
     
     <!-- Footer -->
     <footer class="page-footer">
@@ -133,5 +135,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="main.js"></script>
+
+    <script>
+        function confirmDelete(solutionId) {
+            if (confirm("Are you sure you want to delete this solution?")) {
+                // If the user confirms, send an AJAX request to delete the solution
+                $.ajax({
+                    url: `/delete_solution/${solutionId}`,
+                    method: "DELETE", // Use DELETE method
+                    success: function(response) {
+                        // Handle success, such as redirecting to a success page or updating the UI
+                        if (response.success) {
+                            alert("Solution deleted successfully.");
+                            // You can add code here to update the UI as needed
+                            window.location.reload(); // Reload the page or update the UI
+                        } else {
+                            alert("Failed to delete the solution.");
+                        }
+                    },
+                    error: function() {
+                        // Handle errors, such as displaying an error message
+                        alert("An error occurred while deleting the solution.");
+                    }
+                });
+            }
+        }
+    </script>
+
 </body>
 </html>

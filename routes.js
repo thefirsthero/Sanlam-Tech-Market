@@ -358,4 +358,48 @@ router.get('/user_solutions', async (req, res) => {
     }
 });
 
+// Delete a solution from the database
+router.delete('/delete_solution/:solutionId', async (req, res) => {
+    if (req.session.authenticated) {
+        try {
+            const solutionId = req.params.solutionId;
+
+            // Check if the solution belongs to the currently authenticated user
+            const [solution] = await database.query('SELECT * FROM solutions WHERE solutionId = ?', [solutionId]);
+            if (!solution) {
+                return res.status(404).json({ success: false, message: 'Solution not found' });
+            }
+
+            // Get the user's email from the session
+            const useremail = req.session.useremail;
+
+            // Get the user's ID based on the email
+            const [user] = await database.query('SELECT user_identifier FROM user_table WHERE user_email = ?', [useremail]);
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+
+            // Check if the solution belongs to the authenticated user
+            if (solution.user_identifier !== user.user_identifier) {
+                return res.status(403).json({ success: false, message: 'Permission denied' });
+            }
+
+            // Delete the solution from the database
+            await database.query('DELETE FROM solutions WHERE solutionId = ?', [solutionId]);
+
+            // Respond with success
+            res.status(200).json({ success: true, message: 'Solution deleted successfully' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ success: false, message: 'An error occurred while deleting the solution' });
+        }
+    } else {
+        // Unauthorized access
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+});
+
+
+
 module.exports = router;
