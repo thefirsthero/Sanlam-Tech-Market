@@ -122,7 +122,7 @@ router.get("/test", async (req, res) => {
 //Download router
 router.get("/download", async (req, res) => {   
     // Download function provided by express
-    const path = req.body.solutionPath
+    const path = req.query.solutionPath
     console.log(path)
     res.download(path, function(err) {
         if(err) {
