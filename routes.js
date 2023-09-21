@@ -1,7 +1,9 @@
+const fs = require('fs');
 const express = require("express");
 const path = require("path");
 const router = express.Router();
 const database = require("./database");
+const multer = require('multer'); // Require multer for handling file uploads
 
 //home route
 router.get("/", (req, res) => {
@@ -156,7 +158,7 @@ router.get('/adminPortal', async (req, res) => {
         console.log(admins);
 
     } else {
-        console.log("Admiin not registered!!!");
+        console.log("Admin not registered!!!");
     }
 
 });
@@ -183,5 +185,123 @@ router.get("/update", async(req, res) => {
 router.get("/upload", (req, res) => {
     res.render(path.join(__dirname, "public", "upload_solutions.ejs"));
 })
+
+const documentationStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // Specify the destination folder for documentation
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        // Use the original file name
+        cb(null, file.originalname);
+    }
+});
+
+const solutionZipStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // Specify the destination folder for solutionZip
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        // Use the original file name
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            // Specify the destination folder for uploaded files
+            cb(null, 'uploads/');
+        },
+        filename: (req, file, cb) => {
+            // Use the original file name
+            cb(null, file.originalname);
+        }
+    }),
+    fileFilter: (req, file, cb) => {
+        // You can add custom file filtering logic here if needed
+        // For example, check file types, etc.
+        cb(null, true);
+    }
+});
+
+
+
+// Add the /upload route handler
+router.post("/upload", upload.fields([
+    { name: 'documentation', maxCount: 1 },
+    { name: 'solutionZip', maxCount: 1 },
+]), async (req, res) => {
+    // Retrieve data from the form
+    const solutionName = req.body.solutionName;
+    const solutionDescription = req.body.solutionDescription;
+    const solutionCategory = req.body.solutionCategory;
+    const solutionTags = req.body.solutionTags;
+    const codeSnippets = req.body.codeSnippets;
+    const repositoryLink = req.body.repositoryLink;
+
+    // You can check if the files were uploaded and handle them accordingly
+    const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
+    const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
+
+    // Insert data into the solutions table, including file paths if they exist
+    const sql = `
+        INSERT INTO solutions
+        (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    try {
+        // Execute the SQL query using mysql2
+        await database.query(
+            sql,
+            [
+                solutionName,
+                solutionDescription,
+                documentationFile ? 'uploads/' + documentationFile.originalname : null,
+                solutionZipFile ? 'uploads/' + solutionZipFile.originalname : null,
+                solutionCategory,
+                solutionTags,
+                codeSnippets,
+                repositoryLink,
+            ]
+        );
+
+        // Handle file uploads separately if they exist
+        if (documentationFile && documentationFile.buffer) {
+            const documentationFilePath = 'uploads/' + documentationFile.originalname;
+            fs.writeFile(documentationFilePath, documentationFile.buffer, (err) => {
+                if (err) {
+                    console.error('Error writing documentation file: ' + err.message);
+                } else {
+                    console.log('Documentation file saved:', documentationFilePath);
+                }
+            });
+        }
+
+        if (solutionZipFile && solutionZipFile.buffer) {
+            const solutionZipFilePath = 'uploads/' + solutionZipFile.originalname;
+            fs.writeFile(solutionZipFilePath, solutionZipFile.buffer, (err) => {
+                if (err) {
+                    console.error('Error writing solution ZIP file: ' + err.message);
+                } else {
+                    console.log('Solution ZIP file saved:', solutionZipFilePath);
+                }
+            });
+        }
+
+        console.log('Solution uploaded successfully');
+        
+        // Send a success message to the user and redirect to client_home
+        // Redirect to the /client_home page after a successful upload
+        res.redirect('/client_home');
+    } catch (error) {
+        console.error('Error inserting data into the database: ' + error.message);
+        // Redirect to the /client_home page after a successful upload
+        res.redirect('/upload');
+    }
+});
+
 
 module.exports = router;
