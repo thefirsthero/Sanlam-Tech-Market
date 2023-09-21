@@ -79,10 +79,27 @@ router.get("/about", (req, res) => {
 router.get("/resetpass", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "resetpassword.html"));
 })
+//All_Solutions route
+router.get("/All_solutions", async (req, res) => {
+    try {
+        const solutions = await database.query("SELECT * FROM solutions");
+        res.status(200).render(path.join(__dirname, "public", "categories_page"), {solutions});
+        //console.log(tester)
+
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send("Error occurred");
+    }
+});
 //Single_Solution route
 router.get("/single_solution", async (req, res) => {
     try {
-        res.status(200).render(path.join(__dirname, "public", "single_solution"));
+        const tester = req.policies
+        const solution = await database.query("SELECT * FROM solutions WHERE solution_name = 'PowerAutomate Emailer'");
+        res.status(200).render(path.join(__dirname, "public", "single_solution"), {solution});
+        console.log(tester)
+
     }
     catch (error) {
         console.log(error);
@@ -94,7 +111,7 @@ router.get("/single_solution", async (req, res) => {
 router.get("/test", async (req, res) => {
     try {
         const results = await database.query("SELECT * FROM user_table");
-        res.status(200).send(results);
+        res.status(200).render(path.join(__dirname, "public", "categories_page"));
     }
     catch (error) {
         console.log(error);

@@ -38,15 +38,13 @@
             </ul>
         </div>
     </nav>
-
+    <% solution.forEach((solution, index) => { %>
     <div class="container mt-5">
             <div class="image">
                 <img src="images/power_platform.jpg" width="350">
             </div>
-                <h2>Microsoft Power Platform</h2>
-                <p><h6>Microsoft's Power Platform is a comprehensive suite of tools that allows users to create custom applications, automate workflows, and analyze data without extensive coding expertise. It consists of Power Apps for app development, Power Automate for workflow automation, and Power BI for data visualization and analytics. 
-                    Power Virtual Agents enables the creation of chatbots to enhance customer engagement. 
-                    The Power Platform democratizes technology, enabling businesses to boost productivity, streamline processes, and derive actionable insights from their data.</h6></p>
+                <h2><%=solution.solution_name%></h2>
+                <p><h6><%=solution.solution_description%></h6></p>
                 <p><button class="btn btn-primary">View Documentation</button></p>
                 <p><button class="btn btn-primary">Download Package</button></p>
                 <p><button class="btn btn-primary">Repository Link</button></p>
@@ -54,6 +52,12 @@
                     <p>Code Snippet</p>  
                 </div>           
     </div>
+    <% }); %>
+   
+
+    <script>
+        var parse
+    </script>
 
     <footer class="page-footer">
         <div class="container">
