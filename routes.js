@@ -314,5 +314,31 @@ router.post('/upload', upload.fields([
     }
 });
 
+router.get('/user_solutions', async (req, res) => {
+    if (req.session.authenticated) {
+        try {
+            // Retrieve the user's email from the session
+            const useremail = req.session.useremail;
+
+            // Get the user's ID based on the email
+            const [user] = await database.query('SELECT user_identifier FROM user_table WHERE user_email = ?', [useremail]);
+
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Fetch user-specific solutions based on user_identifier
+            const userSolutions = await database.query('SELECT * FROM solutions WHERE user_identifier = ?', [user.user_identifier]);
+
+            // Render the user_solutions.ejs page with user-specific solutions
+            res.render('user_solutions', { userSolutions });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error occurred');
+        }
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'tenor.gif'));
+    }
+});
 
 module.exports = router;
