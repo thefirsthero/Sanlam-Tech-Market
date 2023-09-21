@@ -294,10 +294,12 @@ router.post("/upload", upload.fields([
         console.log('Solution uploaded successfully');
         
         // Send a success message to the user and redirect to client_home
-        res.status(200).send('Solution uploaded successfully. Redirecting to client home...');
+        // Redirect to the /client_home page after a successful upload
+        res.redirect('/client_home');
     } catch (error) {
         console.error('Error inserting data into the database: ' + error.message);
-        res.status(500).send('Error uploading the solution.');
+        // Redirect to the /client_home page after a successful upload
+        res.redirect('/upload');
     }
 });
 
