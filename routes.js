@@ -226,10 +226,8 @@ const upload = multer({
     }
 });
 
-
-
 // Add the /upload route handler
-router.post("/upload", upload.fields([
+router.post('/upload', upload.fields([
     { name: 'documentation', maxCount: 1 },
     { name: 'solutionZip', maxCount: 1 },
 ]), async (req, res) => {
@@ -245,26 +243,40 @@ router.post("/upload", upload.fields([
     const documentationFile = req.files['documentation'] ? req.files['documentation'][0] : null;
     const solutionZipFile = req.files['solutionZip'] ? req.files['solutionZip'][0] : null;
 
-    // Insert data into the solutions table, including file paths if they exist
-    const sql = `
-        INSERT INTO solutions
-        (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    // Retrieve user email from the session
+    const useremail = req.session.useremail;
 
     try {
+        // Get the user's ID based on the email
+        const [user] = await database.query('SELECT user_identifier FROM user_table WHERE user_email = ?', [useremail]);
+        
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Insert data into the solutions table, including file paths if they exist
+        const sql = `
+            INSERT INTO solutions
+            (solution_name, solution_description, solution_documents_path, solution_codezip_path, solution_category, solution_tags, solution_snippet, solution_link, user_identifier)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const documentationFilePath = documentationFile ? 'uploads/' + documentationFile.originalname : null;
+        const solutionZipFilePath = solutionZipFile ? 'uploads/' + solutionZipFile.originalname : null;
+
         // Execute the SQL query using mysql2
         await database.query(
             sql,
             [
                 solutionName,
                 solutionDescription,
-                documentationFile ? 'uploads/' + documentationFile.originalname : null,
-                solutionZipFile ? 'uploads/' + solutionZipFile.originalname : null,
+                documentationFilePath,
+                solutionZipFilePath,
                 solutionCategory,
                 solutionTags,
                 codeSnippets,
                 repositoryLink,
+                user.user_identifier, // Add user identifier
             ]
         );
 
@@ -292,13 +304,12 @@ router.post("/upload", upload.fields([
         }
 
         console.log('Solution uploaded successfully');
-        
+
         // Send a success message to the user and redirect to client_home
-        // Redirect to the /client_home page after a successful upload
         res.redirect('/client_home');
     } catch (error) {
         console.error('Error inserting data into the database: ' + error.message);
-        // Redirect to the /client_home page after a successful upload
+        // Redirect to the /upload page after an error
         res.redirect('/upload');
     }
 });
