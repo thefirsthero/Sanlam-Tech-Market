@@ -82,12 +82,13 @@ router.get("/resetpass", (req, res) => {
 //All_Solutions route
 router.get("/All_solutions", async (req, res) => {
     try {
-        const solutions = await database.query("SELECT * FROM solutions");
+        const solution_category = req.query.policyName;
+        const solutions = await database.query("SELECT * FROM solutions WHERE solution_category = ?", [solution_category]);
+        console.log(solutions)
         res.status(200).render(path.join(__dirname, "public", "categories_page"), {solutions});
-        //console.log(tester)
 
-    }
-    catch (error) {
+        
+    } catch (error) {
         console.log(error);
         res.status(500).send("Error occurred");
     }
@@ -95,8 +96,8 @@ router.get("/All_solutions", async (req, res) => {
 //Single_Solution route
 router.get("/single_solution", async (req, res) => {
     try {
-        const tester = req.policies
-        const solution = await database.query("SELECT * FROM solutions WHERE solution_name = 'PowerAutomate Emailer'");
+        const tester = req.query.solutionName
+        const solution = await database.query("SELECT * FROM solutions WHERE solution_name = ?", [tester]);
         res.status(200).render(path.join(__dirname, "public", "single_solution"), {solution});
         console.log(tester)
 
@@ -118,6 +119,18 @@ router.get("/test", async (req, res) => {
         res.status(500).send("Error occurred");
     }
 });
+//Download router
+router.get("/download", async (req, res) => {   
+    // Download function provided by express
+    const path = req.body.solutionPath
+    console.log(path)
+    res.download(path, function(err) {
+        if(err) {
+            console.log(err);
+        }
+    })
+});
+
 
 
 

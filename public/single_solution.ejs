@@ -8,9 +8,14 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main.css">
 </head>
+<script>
+function viewSolutions(solutionPath) {
+    window.location.href = `/download?solution=${encodeURIComponent(solutionPath)}`;
+}
+</script>
+
 
 <body>
-    <!-- Header Navigation -->
     <nav class="navbar navbar-expand-md">
         <a class="navbar-brand" href="#">
             <img src="images/footerLogoWhite.png" title="title" alt="additional title" />
@@ -41,11 +46,13 @@
     <% solution.forEach((solution, index) => { %>
     <div class="container mt-5">
             <div class="image">
-                <img src="images/power_platform.jpg" width="350">
+                <img src="images/policies/<%=solution.solution_category%>.png" width="350">
             </div>
                 <h2><%=solution.solution_name%></h2>
                 <p><h6><%=solution.solution_description%></h6></p>
-                <p><button class="btn btn-primary">View Documentation</button></p>
+                <h6><%=solution.solution_documents_path%></h6>
+                
+                <p><button class="btn btn-primary" onclick="viewSolutions('<%=solution.solution_documents_path%>')">View Documentation</button></p>
                 <p><button class="btn btn-primary">Download Package</button></p>
                 <p><button class="btn btn-primary">Repository Link</button></p>
                 <div class = "panel panel-default"> 

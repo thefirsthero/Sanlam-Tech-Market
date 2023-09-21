@@ -12,14 +12,38 @@
         .policy-image {
             width: 400px; /* Set the desired width */
             height: 200px; /* Set the desired height */
+            object-fit: cover; /* Maintain aspect ratio and cover the area */
         }
-
+    
         /* CSS to create gaps between policy rows */
         .policy-row {
             margin-bottom: 20px; /* Adjust the margin value to set the desired gap size */
         }
+    
+        /* CSS to make all col-md-4 elements the same height */
+        .policy-cards {
+            display: flex;
+            flex-wrap: wrap;
+            height: 400
+        }
+    
+        .tile {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .block {
+            flex: 1;
+        }
     </style>
+   
 </head>
+<script>
+    function viewSolutions(policyName) {
+        window.location.href = `/All_solutions?policyName=${encodeURIComponent(policyName)}`;
+    }
+</script>
+
     
 <body>
     <nav class="navbar navbar-expand-md">
@@ -93,7 +117,7 @@
                                             </button>
                                         </div>
                                         <div class="col-8">
-                                            <button type="button" class="btn btn-block btn-primary btn-circle btn-icon-left" onclick =window.location.href="/All_solutions">
+                                            <button type="button" class="btn btn-block btn-primary btn-circle btn-icon-left" onclick="viewSolutions('<%=policy.policy_name%>')">
                                                 <i class="fa fa-code-fork"></i> View Solution(s)
                                             </button>
                                         </div>
