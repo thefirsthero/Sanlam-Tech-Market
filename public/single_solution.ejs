@@ -8,9 +8,20 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main.css">
 </head>
+<style>
+    .btn-primary {
+        width: 175px; /* Adjust the width to your desired value */
+    }
+</style>
+<script>
+    function viewSolutions(solutionPath) {
+        const url = `/download?solutionPath=${encodeURIComponent(solutionPath)}`;
+        window.location.href = url;
+    }
+</script>
+
 
 <body>
-    <!-- Header Navigation -->
     <nav class="navbar navbar-expand-md">
         <a class="navbar-brand" href="#">
             <img src="images/footerLogoWhite.png" title="title" alt="additional title" />
@@ -44,24 +55,19 @@
     <% solution.forEach((solution, index) => { %>
     <div class="container mt-5">
             <div class="image">
-                <img src="images/power_platform.jpg" width="350">
+                <img src="images/policies/<%=solution.solution_category%>.png" width="350">
             </div>
                 <h2><%=solution.solution_name%></h2>
-                <p><h6><%=solution.solution_description%></h6></p>
-                <p><button class="btn btn-primary">View Documentation</button></p>
-                <p><button class="btn btn-primary">Download Package</button></p>
-                <p><button class="btn btn-primary">Repository Link</button></p>
+                <div class="button-container">
+                <p><button class="btn btn-primary" onclick="viewSolutions('<%=solution.solution_documents_path%>')">View Documentation</button></p>
+                <p><button class="btn btn-primary" onclick="viewSolutions('<%=solution.solution_codezip_path%>')">Download Package</button></p>
+                <p><button class="btn btn-primary" onclick="window.open('<%=solution.solution_link%>')">Repository Link</button></p>
+                </div>
                 <div class = "panel panel-default"> 
                     <p>Code Snippet</p>  
                 </div>           
     </div>
     <% }); %>
-   
-
-    <script>
-        var parse
-    </script>
-
     <footer class="page-footer">
         <div class="container">
             <div class="row">
